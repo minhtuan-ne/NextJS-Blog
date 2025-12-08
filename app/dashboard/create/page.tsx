@@ -2,9 +2,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-label";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { prisma } from "@/app/utils/db";
 import { handleSubmission } from "@/app/actions";
+import { Submitbutton } from "@/components/general/Submitbutton";
 
 export default function CreateBlogRoute() {
     return (
@@ -33,9 +32,7 @@ export default function CreateBlogRoute() {
                             <Input name="url" required type="url" placeholder="Image url"/>
                         </div>
 
-                        <Button>
-                            Create Post
-                        </Button>
+                        <Submitbutton />
                     </form>
                 </CardContent>
             </Card>
