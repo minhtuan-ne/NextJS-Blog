@@ -26,7 +26,7 @@ export default async function DashboardRoute() {
         redirect("/api/auth/register");
     }
 
-    const data = await getData(user.id);
+    const data = await getData(user?.id);
 
     return (
         <div>
