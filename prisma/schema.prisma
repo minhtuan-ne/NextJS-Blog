@@ -24,4 +24,38 @@ model BlogPost {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  likes     Like[]
+  comments  Comment[]
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  post BlogPost @relation(fields: [postId], references: [id])
+
+  @@unique([postId, userId])
+  @@index([userId])
+}
+
+model Comment {
+  id        String    @id @default(uuid())
+  postId    String
+  userId    String
+  userName  String
+  userImage String
+  content   String
+  parentId  String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  post     BlogPost @relation(fields: [postId], references: [id])
+  parent   Comment? @relation("CommentToComment", fields: [parentId], references: [id])
+  replies  Comment[] @relation("CommentToComment")
+
+  @@index([postId])
+  @@index([parentId])
 }
