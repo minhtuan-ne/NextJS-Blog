@@ -123,20 +123,59 @@ learn-nextjs/
 
 ## 🗄️ Database Schema
 
-The application uses a single `BlogPost` model:
-
 ```prisma
 model BlogPost {
-  id          String   @id @default(uuid())
-  title       String
-  content     String
-  imageUrl    String
-  authorId    String
-  authorName  String
+  id String @id @default(uuid())
+  title String
+  content String
+  imageUrl String
+  authorId String
+  authorName String
   authorImage String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  likes     Like[]
+  comments  Comment[]
 }
+
+model Like {
+  id        String   @id @default(uuid())
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  post BlogPost @relation(fields: [postId], references: [id])
+
+  @@unique([postId, userId])
+  @@index([userId])
+}
+
+model Comment {
+  id        String    @id @default(uuid())
+  postId    String
+  userId    String
+  userName  String
+  userImage String
+  content   String
+  parentId  String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  post     BlogPost @relation(fields: [postId], references: [id])
+  parent   Comment? @relation("CommentToComment", fields: [parentId], references: [id])
+  replies  Comment[] @relation("CommentToComment")
+
+  @@index([postId])
+  @@index([parentId])
+}
+```
+
+Run migrations after updating the schema:
+```bash
+pnpm prisma generate
+pnpm prisma migrate dev --name add-likes-comments
 ```
 
 ## 🔐 Authentication
