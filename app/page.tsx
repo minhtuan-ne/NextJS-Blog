@@ -1,48 +1,78 @@
 import { BlogPostCard } from "@/components/general/BlogPostCard";
+import { FilterTabs } from "@/components/general/FilterTabs";
 import { prisma } from "./utils/db";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
-async function getData() {
-  const data = await prisma.blogPost.findMany(
-    {
-      select: {
-        title: true,
-        content: true,
-        imageUrl: true,
-        authorImage: true,
-        authorName: true,
-        id: true,
-        createdAt: true,
-        authorId: true,
-        updatedAt: true,
+type SortOption = "latest" | "top" | "discussions";
+type PostWithCounts = {
+  id: string;
+  title: string;
+  content: string;
+  imageUrl: string;
+  authorId: string;
+  authorName: string;
+  authorImage: string;
+  createdAt: Date;
+  updatedAt: Date;
+  _count: { likes: number; comments: number };
+};
+
+async function getData(sort: SortOption) {
+  const orderBy =
+    sort === "top"
+      ? [{ likes: { _count: "desc" } }, { createdAt: "desc" }]
+      : sort === "discussions"
+      ? [{ comments: { _count: "desc" } }, { createdAt: "desc" }]
+      : [{ createdAt: "desc" }];
+
+  const data = (await prisma.blogPost.findMany({
+    orderBy: orderBy as any,
+    include: {
+      _count: {
+        select: {
+          likes: true,
+          comments: true,
+        },
       },
-    }
-  );
+    },
+  } as any)) as PostWithCounts[];
   return data;
 }
 
-export default async function Home() {
+type SearchParams = { sort?: SortOption };
+
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const params = await searchParams;
+  const sort = (params?.sort as SortOption) || "latest";
+
   return (
     <div className="py-6">
-      <h1 className="text-3xl font-bold tracking-tight mb-8">Latest posts</h1>
+      <div className="mb-8 flex items-center justify-between">
+        <h1 className="text-3xl font-bold tracking-tight">Explore posts</h1>
+        <FilterTabs />
+      </div>
       <Suspense fallback={<BlogPostsGrid />}>
-        <BlogPosts />
+        <BlogPosts sort={sort} />
       </Suspense>
     </div>
   );
 }
 
-async function BlogPosts() {
-  const data = await getData()
+async function BlogPosts({ sort }: { sort: SortOption }) {
+  const data = await getData(sort);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {data.map((item) => (
-        <BlogPostCard data={item} key={item.id}/>
+        <BlogPostCard data={item} key={item.id} />
       ))}
     </div>
-  )
+  );
 }
 
 // Blog posts grid with loading state
