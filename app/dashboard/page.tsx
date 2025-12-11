@@ -13,6 +13,23 @@ async function getData(userId: string) {
         orderBy: {
             createdAt: 'desc',
         },
+        select: {
+            id: true,
+            title: true,
+            content: true,
+            imageUrl: true,
+            authorId: true,
+            authorImage: true,
+            authorName: true,
+            createdAt: true,
+            updatedAt: true,
+            _count: {
+                select: {
+                    likes: true,
+                    comments: true,
+                }
+            }
+        }
     });
     
     return data;
