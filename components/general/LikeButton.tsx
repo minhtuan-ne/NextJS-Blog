@@ -10,23 +10,28 @@ interface LikeButtonProps {
   initialLiked: boolean;
 }
 
+type LikeState = {
+  count: number;
+  liked: boolean;
+};
+
 export function LikeButton({
   postId,
   initialCount,
   initialLiked,
 }: LikeButtonProps) {
   const [isPending, startTransition] = useTransition();
-  const [state, setState] = useOptimistic(
+  const [state, setState] = useOptimistic<LikeState, LikeState>(
     { count: initialCount, liked: initialLiked },
-    (prev) => prev
+    (prev: LikeState) => prev
   );
 
   const handleToggle = () => {
     startTransition(async () => {
-      setState((prev) => ({
-        count: prev.count + (prev.liked ? -1 : 1),
-        liked: !prev.liked,
-      }));
+      setState({
+        count: state.count + (state.liked ? -1 : 1),
+        liked: !state.liked,
+      });
       await toggleLike(postId);
     });
   };
@@ -49,4 +54,3 @@ export function LikeButton({
     </button>
   );
 }
-
