@@ -51,12 +51,20 @@ export function BlogPostCard({ data, showOptions }: IappProps) {
                   <Edit2 className="h-4 w-4" />
                 </Button>
               </Link>
-              <form action={deletePost}>
+              <form 
+                action={deletePost}
+                onSubmit={(e) => {
+                  if (!window.confirm("Are you sure you want to delete this post? This action cannot be undone.")) {
+                    e.preventDefault();
+                  }
+                }}
+              >
                 <input type="hidden" name="postId" value={data.id} />
                 <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50">
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </form>
+
             </div>
           )}
         </div>
