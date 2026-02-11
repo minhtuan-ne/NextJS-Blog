@@ -1,5 +1,10 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { Button } from "../ui/button";
+import { Edit2, Trash2 } from "lucide-react";
+import { deletePost } from "@/app/actions";
 
 interface IappProps {
   data: {
@@ -17,15 +22,16 @@ interface IappProps {
       comments: number;
     };
   };
+  showOptions?: boolean;
 }
 
-export function BlogPostCard({ data }: IappProps) {
+export function BlogPostCard({ data, showOptions }: IappProps) {
   return (
     <div className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-md transition-all hover:shadow-lg h-full flex flex-col">
       <Link href={`/post/${data.id}`} className="block w-full">
         <div className="relative h-48 w-full overflow-hidden">
           <Image
-            src={data.imageUrl}
+            src={data.imageUrl || "/file.svg"}
             alt="Image for blog"
             className="object-cover transition-transform duration-300 group-hover:scale-105"
             fill
@@ -34,19 +40,36 @@ export function BlogPostCard({ data }: IappProps) {
       </Link>
 
       <div className="p-4 flex flex-col flex-grow">
-        <h3 className="mb-2 text-lg font-semibold text-gray-900">
-          {data.title}
-        </h3>
+        <div className="flex items-start justify-between mb-2">
+          <h3 className="text-lg font-semibold text-gray-900 line-clamp-1">
+            {data.title}
+          </h3>
+          {showOptions && (
+            <div className="flex gap-1">
+              <Link href={`/dashboard/edit/${data.id}`}>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-amber-600 hover:text-amber-700 hover:bg-amber-50">
+                  <Edit2 className="h-4 w-4" />
+                </Button>
+              </Link>
+              <form action={deletePost}>
+                <input type="hidden" name="postId" value={data.id} />
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50">
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </form>
+            </div>
+          )}
+        </div>
 
         <p className="mb-4 text-sm text-gray-600 line-clamp-2 flex-grow">
-          {data.content}
+          {data.content.replace(/<[^>]*>/g, "")}
         </p>
 
         <div className="flex items-center justify-between mt-auto">
           <div className="flex items-center space-x-2">
             <div className="relative size-8 overflow-hidden rounded-full">
               <Image
-                src={data.authorImage}
+                src={data.authorImage || "/file.svg"}
                 alt={data.authorName}
                 fill
                 className="object-cover"

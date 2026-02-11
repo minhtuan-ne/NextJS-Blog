@@ -1,5 +1,7 @@
 @import "tailwindcss";
+@plugin "../node_modules/@tailwindcss/typography";
 @import "tw-animate-css";
+@import "../node_modules/katex/dist/katex.min.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -116,7 +118,29 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* TipTap Editor Styles */
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #adb5bd;
+  pointer-events: none;
+  height: 0;
+}
+
+.ProseMirror:focus {
+  outline: none;
+}
+
+.prose img {
+  @apply rounded-xl border shadow-sm;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-primary pl-4 italic text-muted-foreground;
 }

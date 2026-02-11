@@ -7,11 +7,11 @@ import { revalidatePath } from "next/cache";
 const db = prisma as any;
 
 export async function handleSubmission(formData: FormData) {
-    const {getUser} = getKindeServerSession();
+    const { getUser } = getKindeServerSession();
     const user = await getUser();
 
-    if (!user) {
-        return redirect("/api/auth/register")
+    if (!user || user.email !== "phamtranminhtuan2006@gmail.com") {
+        return redirect("/")
     }
 
     const title = formData.get('title');
@@ -19,17 +19,17 @@ export async function handleSubmission(formData: FormData) {
     const url = formData.get('url');
 
     await prisma.blogPost.create({
-    data: {
-        title: title as string,
-        content: content as string,
-        imageUrl: url as string,
-        authorId: user.id as string,
-        authorImage: user.picture as string,
-        authorName: user.given_name as string,
-    },
-   });
+        data: {
+            title: title as string,
+            content: content as string,
+            imageUrl: url as string,
+            authorId: user.id as string,
+            authorImage: user.picture as string,
+            authorName: user.given_name as string,
+        },
+    });
 
-   return redirect("/dashboard")
+    return redirect("/dashboard")
 
 }
 
@@ -106,4 +106,72 @@ export async function addComment(formData: FormData) {
 
     revalidatePath(`/post/${postId}`);
     revalidatePath("/");
+}
+
+export async function deletePost(formData: FormData) {
+    const postId = formData.get("postId") as string;
+    const { getUser } = getKindeServerSession();
+    const user = await getUser();
+
+    if (!user) {
+        return redirect("/api/auth/register");
+    }
+
+    const post = await prisma.blogPost.findUnique({
+        where: { id: postId },
+        select: { authorId: true }
+    });
+
+    if (!post || (post.authorId !== user.id && user.email !== "phamtranminhtuan2006@gmail.com")) {
+        throw new Error("Unauthorized");
+    }
+
+    await prisma.blogPost.delete({
+        where: {
+            id: postId,
+        },
+    });
+
+    revalidatePath("/");
+    revalidatePath("/dashboard");
+    return redirect("/dashboard");
+}
+
+export async function updatePost(formData: FormData) {
+    const { getUser } = getKindeServerSession();
+    const user = await getUser();
+
+    if (!user) {
+        return redirect("/api/auth/register");
+    }
+
+    const postId = formData.get("postId") as string;
+    const title = formData.get("title") as string;
+    const content = formData.get("content") as string;
+    const url = formData.get("url") as string;
+
+    const post = await prisma.blogPost.findUnique({
+        where: { id: postId },
+        select: { authorId: true }
+    });
+
+    if (!post || (post.authorId !== user.id && user.email !== "phamtranminhtuan2006@gmail.com")) {
+        throw new Error("Unauthorized");
+    }
+
+    await prisma.blogPost.update({
+        where: {
+            id: postId,
+        },
+        data: {
+            title,
+            content,
+            imageUrl: url,
+        },
+    });
+
+    revalidatePath("/");
+    revalidatePath(`/post/${postId}`);
+    revalidatePath("/dashboard");
+    return redirect("/dashboard");
 }

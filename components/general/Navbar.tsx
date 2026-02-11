@@ -38,9 +38,11 @@ export function Navbar() {
           <Link className={linkClass("/")} href="/">
             Home
           </Link>
-          <Link className={linkClass("/dashboard")} href="/dashboard">
-            Dashboard
-          </Link>
+          {user?.email === "phamtranminhtuan2006@gmail.com" && (
+            <Link className={linkClass("/dashboard")} href="/dashboard">
+              Dashboard
+            </Link>
+          )}
         </div>
       </div>
 

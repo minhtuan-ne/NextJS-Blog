@@ -11,6 +11,8 @@ import {
 } from "@/components/general/CommentsSection";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
+import { MathRenderer } from "@/components/general/MathRenderer";
+
 async function getData(id: string, userId?: string) {
   const data = await prisma.blogPost.findUnique({
     where: {
@@ -134,7 +136,7 @@ export default async function IdPage({ params }: { params: Params }) {
       </div>
 
       
-      <p className="text-gray-700">{data.content}</p>
+      <MathRenderer html={data.content} />
        
       <CommentsSection postId={data.id} comments={commentTree} />
     </div>
