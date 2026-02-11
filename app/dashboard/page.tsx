@@ -39,8 +39,8 @@ export default async function DashboardRoute() {
     const {getUser} = getKindeServerSession();
     const user = await getUser();
 
-    if (!user) {
-        redirect("/api/auth/register");
+    if (!user || user.email !== "phamtranminhtuan2006@gmail.com") {
+        redirect("/");
     }
 
     const data = await getData(user?.id);

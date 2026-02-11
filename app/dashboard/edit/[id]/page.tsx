@@ -29,8 +29,8 @@ export default async function EditPostRoute({ params }: { params: Promise<{ id: 
     const { getUser } = getKindeServerSession();
     const user = await getUser();
 
-    if (!user) {
-        return redirect("/api/auth/register");
+    if (!user || user.email !== "phamtranminhtuan2006@gmail.com") {
+        return redirect("/");
     }
 
     const data = await getPost(id, user.id);

@@ -122,8 +122,12 @@ export async function deletePost(formData: FormData) {
         select: { authorId: true }
     });
 
-    if (!post || (post.authorId !== user.id && user.email !== "phamtranminhtuan2006@gmail.com")) {
+    if (!user || user.email !== "phamtranminhtuan2006@gmail.com") {
         throw new Error("Unauthorized");
+    }
+
+    if (!post) {
+        throw new Error("Post not found");
     }
 
     await prisma.blogPost.delete({
@@ -155,8 +159,12 @@ export async function updatePost(formData: FormData) {
         select: { authorId: true }
     });
 
-    if (!post || (post.authorId !== user.id && user.email !== "phamtranminhtuan2006@gmail.com")) {
+    if (!user || user.email !== "phamtranminhtuan2006@gmail.com") {
         throw new Error("Unauthorized");
+    }
+
+    if (!post) {
+        throw new Error("Post not found");
     }
 
     await prisma.blogPost.update({
