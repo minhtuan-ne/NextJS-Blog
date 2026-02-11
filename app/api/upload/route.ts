@@ -1,6 +1,5 @@
+import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
 export async function POST(request: Request) {
@@ -19,26 +18,15 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "No file provided" }, { status: 400 });
         }
 
-        const bytes = await file.arrayBuffer();
-        const buffer = Buffer.from(bytes);
+        // Upload to Vercel Blob
+        const blob = await put(file.name, file, {
+            access: 'public',
+        });
 
-        const uploadDir = path.join(process.cwd(), "public", "uploads");
-
-        // Ensure directory exists
-        try {
-            await mkdir(uploadDir, { recursive: true });
-        } catch (e) {
-            // Ignore if directory already exists
-        }
-
-        const filename = `${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
-        const filePath = path.join(uploadDir, filename);
-
-        await writeFile(filePath, buffer);
-
-        return NextResponse.json({ url: `/uploads/${filename}` });
+        return NextResponse.json({ url: blob.url });
     } catch (error) {
         console.error("Upload error:", error);
         return NextResponse.json({ error: "Upload failed" }, { status: 500 });
     }
 }
+

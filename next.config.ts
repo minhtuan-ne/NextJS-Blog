@@ -19,7 +19,13 @@ const nextConfig: NextConfig = {
         hostname: 'lh3.googleusercontent.com',
         protocol: 'https',
         port: "",
+      },
+      {
+        hostname: '*.public.blob.vercel-storage.com',
+        protocol: 'https',
+        port: "",
       }
+
     ]
   }
 };
