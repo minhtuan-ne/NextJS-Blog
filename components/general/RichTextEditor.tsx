@@ -20,7 +20,9 @@ import {
   Quote, 
   ImageIcon,
   Link as LinkIcon,
-  Sigma
+  Sigma,
+  Code,
+  Terminal
 } from "lucide-react";
 import { Button } from "../ui/button";
 
@@ -202,6 +204,16 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
           title="Insert Math (LaTeX)"
         >
           <Sigma className="w-4 h-4" />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+          className={editor.isActive("codeBlock") ? "bg-zinc-100 dark:bg-zinc-800" : ""}
+          title="Code Block"
+        >
+          <Code className="w-4 h-4" />
         </Button>
       </div>
 

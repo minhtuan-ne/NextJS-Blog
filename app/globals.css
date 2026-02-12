@@ -144,3 +144,28 @@
 .prose blockquote {
   @apply border-l-4 border-primary pl-4 italic text-muted-foreground;
 }
+
+.prose pre {
+  @apply bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto my-6 font-mono text-sm leading-relaxed border border-zinc-800 shadow-sm;
+}
+
+.prose code {
+  @apply font-mono text-sm px-1.5 py-0.5 rounded-md bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100;
+}
+
+.prose pre code {
+  @apply p-0 bg-transparent text-inherit;
+}
+
+/* Custom scrollbar for code blocks */
+.prose pre::-webkit-scrollbar {
+  height: 8px;
+}
+
+.prose pre::-webkit-scrollbar-track {
+  @apply bg-zinc-900 rounded-b-lg;
+}
+
+.prose pre::-webkit-scrollbar-thumb {
+  @apply bg-zinc-700 rounded-full border-2 border-zinc-900 hover:bg-zinc-600;
+}

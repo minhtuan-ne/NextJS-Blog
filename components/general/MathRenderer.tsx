@@ -16,6 +16,15 @@ export function MathRenderer({ html }: { html: string }) {
         ],
         throwOnError: false,
       });
+
+      // Highlight code blocks using highlight.js from CDN
+      // @ts-ignore
+      if (typeof window !== "undefined" && window.hljs) {
+        containerRef.current.querySelectorAll("pre code").forEach((block) => {
+          // @ts-ignore
+          window.hljs.highlightElement(block);
+        });
+      }
     }
   }, [html]);
 
