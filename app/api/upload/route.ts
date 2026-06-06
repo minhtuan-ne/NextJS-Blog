@@ -3,10 +3,11 @@ import { NextResponse } from "next/server";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
 export async function POST(request: Request) {
-    const { getUser } = getKindeServerSession();
-    const user = await getUser();
+    const { getUser, getPermission } = getKindeServerSession();
+    const [user, adminPermission] = await Promise.all([getUser(), getPermission("admin:access")]);
+    const isAdmin = adminPermission?.isGranted;
 
-    if (!user || user.email !== "phamtranminhtuan2006@gmail.com") {
+    if (!user || !isAdmin) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

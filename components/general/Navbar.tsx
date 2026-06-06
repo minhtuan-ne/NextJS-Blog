@@ -15,8 +15,9 @@ const linkBase = "text-sm font-medium transition-colors";
 
 export function Navbar() {
   const pathname = usePathname();
-  const { getUser } = useKindeBrowserClient();
+  const { getUser, getPermission } = useKindeBrowserClient();
   const user = getUser();
+  const isAdmin = getPermission("admin:access")?.isGranted;
 
   const linkClass = (href: string) =>
     clsx(
@@ -38,7 +39,7 @@ export function Navbar() {
           <Link className={linkClass("/")} href="/">
             Home
           </Link>
-          {user?.email === "phamtranminhtuan2006@gmail.com" && (
+          {isAdmin && (
             <Link className={linkClass("/dashboard")} href="/dashboard">
               Dashboard
             </Link>

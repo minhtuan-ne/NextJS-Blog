@@ -26,10 +26,11 @@ async function getPost(postId: string, userId: string) {
 
 export default async function EditPostRoute({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
-    const { getUser } = getKindeServerSession();
-    const user = await getUser();
+    const { getUser, getPermission } = getKindeServerSession();
+    const [user, adminPermission] = await Promise.all([getUser(), getPermission("admin:access")]);
+    const isAdmin = adminPermission?.isGranted;
 
-    if (!user || user.email !== "phamtranminhtuan2006@gmail.com") {
+    if (!user || !isAdmin) {
         return redirect("/");
     }
 

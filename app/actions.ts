@@ -7,10 +7,11 @@ import { revalidatePath } from "next/cache";
 const db = prisma as any;
 
 export async function handleSubmission(formData: FormData) {
-    const { getUser } = getKindeServerSession();
-    const user = await getUser();
+    const { getUser, getPermission } = getKindeServerSession();
+    const [user, adminPermission] = await Promise.all([getUser(), getPermission("admin:access")]);
+    const isAdmin = adminPermission?.isGranted;
 
-    if (!user || user.email !== "phamtranminhtuan2006@gmail.com") {
+    if (!user || !isAdmin) {
         return redirect("/")
     }
 
@@ -110,10 +111,11 @@ export async function addComment(formData: FormData) {
 
 export async function deletePost(formData: FormData) {
     const postId = formData.get("postId") as string;
-    const { getUser } = getKindeServerSession();
-    const user = await getUser();
+    const { getUser, getPermission } = getKindeServerSession();
+    const [user, adminPermission] = await Promise.all([getUser(), getPermission("admin:access")]);
+    const isAdmin = adminPermission?.isGranted;
 
-    if (!user) {
+    if (!user || !isAdmin) {
         return redirect("/api/auth/register");
     }
 
@@ -121,10 +123,6 @@ export async function deletePost(formData: FormData) {
         where: { id: postId },
         select: { authorId: true }
     });
-
-    if (!user || user.email !== "phamtranminhtuan2006@gmail.com") {
-        throw new Error("Unauthorized");
-    }
 
     if (!post) {
         throw new Error("Post not found");
@@ -142,10 +140,11 @@ export async function deletePost(formData: FormData) {
 }
 
 export async function updatePost(formData: FormData) {
-    const { getUser } = getKindeServerSession();
-    const user = await getUser();
+    const { getUser, getPermission } = getKindeServerSession();
+    const [user, adminPermission] = await Promise.all([getUser(), getPermission("admin:access")]);
+    const isAdmin = adminPermission?.isGranted;
 
-    if (!user) {
+    if (!user || !isAdmin) {
         return redirect("/api/auth/register");
     }
 
@@ -158,10 +157,6 @@ export async function updatePost(formData: FormData) {
         where: { id: postId },
         select: { authorId: true }
     });
-
-    if (!user || user.email !== "phamtranminhtuan2006@gmail.com") {
-        throw new Error("Unauthorized");
-    }
 
     if (!post) {
         throw new Error("Post not found");
