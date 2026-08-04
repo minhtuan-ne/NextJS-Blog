@@ -40,8 +40,8 @@ export function BlogPostCard({ data, showOptions }: IappProps) {
       </Link>
 
       <div className="p-4 flex flex-col flex-grow">
-        <div className="flex items-start justify-between mb-2">
-          <h3 className="text-lg font-semibold text-gray-900 line-clamp-1">
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <h3 className="text-lg font-semibold text-gray-900 break-words flex-1 min-w-0">
             {data.title}
           </h3>
           {showOptions && (

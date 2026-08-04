@@ -93,7 +93,7 @@ export default async function IdPage({ params }: { params: Params }) {
       </Link>
 
       <div className="mb-8 mt-6">
-        <h1 className="text-3-xl font-bold tracking-tight mb-4">
+        <h1 className="text-3xl font-bold tracking-tight mb-4 break-words">
           {data.title}
         </h1>
         <div className="flex items-center justify-between">
