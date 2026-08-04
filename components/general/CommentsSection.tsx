@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { addComment } from "@/app/actions";
+import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
+import { LoginPromptModal } from "@/components/general/LoginPromptModal";
 
 export type CommentNode = {
   id: string;
@@ -44,7 +46,21 @@ function CommentItem({
   comment: CommentNode;
   postId: string;
 }) {
+  const { getUser, isLoading } = useKindeBrowserClient();
   const [replyOpen, setReplyOpen] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
+
+  const handleReplyClick = () => {
+    if (replyOpen) {
+      setReplyOpen(false);
+      return;
+    }
+    if (!isLoading && !getUser()) {
+      setLoginOpen(true);
+      return;
+    }
+    setReplyOpen(true);
+  };
 
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-4">
@@ -73,7 +89,7 @@ function CommentItem({
       <p className="mt-2 text-sm text-gray-800">{comment.content}</p>
       <button
         type="button"
-        onClick={() => setReplyOpen((v) => !v)}
+        onClick={handleReplyClick}
         className="mt-2 text-xs font-medium text-blue-600 hover:underline"
       >
         {replyOpen ? "Cancel" : "Reply"}
@@ -92,6 +108,11 @@ function CommentItem({
           ))}
         </div>
       ) : null}
+      <LoginPromptModal
+        open={loginOpen}
+        onClose={() => setLoginOpen(false)}
+        message="Sign in to reply to this comment."
+      />
     </div>
   );
 }
@@ -103,25 +124,55 @@ function CommentForm({
   postId: string;
   parentId?: string;
 }) {
+  const { getUser, isLoading } = useKindeBrowserClient();
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!isLoading && !getUser()) {
+      setLoginOpen(true);
+      return;
+    }
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    startTransition(async () => {
+      await addComment(formData);
+      form.reset();
+    });
+  };
+
   return (
-    <form action={addComment} className="space-y-2">
-      <input type="hidden" name="postId" value={postId} />
-      {parentId ? (
-        <input type="hidden" name="parentId" value={parentId} />
-      ) : null}
-      <textarea
-        name="content"
-        required
-        rows={3}
-        placeholder="Add a comment..."
-        className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
+    <>
+      <form onSubmit={handleSubmit} className="space-y-2">
+        <input type="hidden" name="postId" value={postId} />
+        {parentId ? (
+          <input type="hidden" name="parentId" value={parentId} />
+        ) : null}
+        <textarea
+          name="content"
+          required
+          rows={3}
+          placeholder="Add a comment..."
+          disabled={isPending}
+          className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none disabled:opacity-70"
+        />
+        <button
+          type="submit"
+          disabled={isPending || Boolean(isLoading)}
+          className="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors disabled:opacity-70"
+        >
+          {isPending ? "Posting..." : "Post comment"}
+        </button>
+      </form>
+      <LoginPromptModal
+        open={loginOpen}
+        onClose={() => setLoginOpen(false)}
+        message="Sign in to join the conversation."
       />
-      <button
-        type="submit"
-        className="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
-      >
-        Post comment
-      </button>
-    </form>
+    </>
   );
 }

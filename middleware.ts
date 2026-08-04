@@ -4,8 +4,8 @@ export default withAuth(
   async function middleware() {
   },
   {
-    // Kinde will not protect these paths
-    publicPaths: ["/"],
+    publicPaths: ["/", "/post"],
+    isReturnToCurrentPage: true,
   }
 );
 
